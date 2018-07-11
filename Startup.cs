@@ -8,6 +8,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 using netCoreWorkshop.Business;
 using Microsoft.EntityFrameworkCore;
+using netCoreWorkshop.Middlewares;
 
 namespace netCoreWorkshop
 {
@@ -23,6 +24,10 @@ namespace netCoreWorkshop
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
+            // Setup options with DI
+            services.AddOptions();
+            services.Configure<APIKeyOptions>(Configuration.GetSection("APIKeyOptions"));
+
             services.AddDbContext<Data.ArticlesContext>(options =>
             {
                 options.UseSqlite(Configuration.GetConnectionString("Articles"));
@@ -50,6 +55,8 @@ namespace netCoreWorkshop
 
             app.UseStaticFiles();
             
+            app.UseAPIKey();
+
             app.UseMvc(routes =>
             {
                 routes.MapRoute(
